@@ -56,6 +56,13 @@ DEFAULT_LABELS: tuple[LabelSpec, ...] = (
     LabelSpec("scope: docs", "78909C", "Documentation"),
     LabelSpec("scope: dependencies", "90A4AE", "Dependency updates"),
     LabelSpec(
+        "dependencies",
+        "0366D6",
+        "Dependency updates and dependency manager pull requests",
+    ),
+    LabelSpec("github-actions", "2088FF", "GitHub Actions workflow updates"),
+    LabelSpec("cargo", "DEA584", "Rust Cargo package and lockfile updates"),
+    LabelSpec(
         "skip-regression-check",
         "9E9E9E",
         "Acknowledged: fix without regression test",

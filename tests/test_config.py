@@ -16,8 +16,8 @@ if typ.TYPE_CHECKING:
 def test_default_labels_import_original_shell_script_set() -> None:
     """The default package data preserves the imported bootstrap labels."""
     # DEFAULT_LABELS mirrors the shell script groups:
-    # size:5 + risk:4 + scope:30 + workflow:1 + contributor:4 = 44.
-    assert len(DEFAULT_LABELS) == 44
+    # size:5 + risk:4 + scope:30 + ecosystem:3 + workflow:1 + contributor:4 = 47.
+    assert len(DEFAULT_LABELS) == 47
     assert DEFAULT_LABELS[0] == LabelSpec(
         "size: XS",
         "F9D0C4",
@@ -27,6 +27,21 @@ def test_default_labels_import_original_shell_script_set() -> None:
         "contributor: core",
         "FF8A65",
         "20+ merged PRs",
+    )
+    assert (
+        LabelSpec(
+            "dependencies",
+            "0366D6",
+            "Dependency updates and dependency manager pull requests",
+        )
+        in DEFAULT_LABELS
+    )
+    assert (
+        LabelSpec("github-actions", "2088FF", "GitHub Actions workflow updates")
+        in DEFAULT_LABELS
+    )
+    assert LabelSpec("cargo", "DEA584", "Rust Cargo package and lockfile updates") in (
+        DEFAULT_LABELS
     )
 
 

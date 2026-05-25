@@ -104,7 +104,7 @@ def _sync_label(
     repository: GitHubRepository,
     label: LabelSpec,
 ) -> LabelSyncResult:
-    """Synchronise one label and return its action."""
+    """Synchronize one label and return its action."""
     existing_label = _find_label(repository, label.name)
     if existing_label is None:
         created_label = repository.create_label(

@@ -1,6 +1,6 @@
 # create-labels developers' guide
 
-This guide summarises the package structure, internal boundaries, and local
+This guide summarizes the package structure, internal boundaries, and local
 development workflow for maintainers.
 
 ## Architecture

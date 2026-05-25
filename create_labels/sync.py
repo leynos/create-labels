@@ -116,10 +116,11 @@ def _sync_label(
             raise RuntimeError(msg)
         return LabelSyncResult(label.name, "created")
 
+    existing_description = existing_label.description
     existing_values = (
         existing_label.name,
-        existing_label.color,
-        existing_label.description,
+        existing_label.color.removeprefix("#").upper(),
+        None if existing_description is None else existing_description.strip(),
     )
     desired_values = (label.name, label.color, label.description)
     if existing_values == desired_values:

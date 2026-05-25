@@ -50,6 +50,20 @@ def test_sync_labels_leaves_matching_existing_labels_unchanged() -> None:
     assert not existing.updates
 
 
+def test_sync_labels_normalizes_existing_label_fields_before_comparison() -> None:
+    """GitHub field formatting differences do not force redundant updates."""
+    existing = make_fake_label("risk: low", "#4caf50", " Low-risk change ")
+    repository = make_fake_repository([existing])
+
+    results = sync_labels(
+        repository,
+        [LabelSpec("risk: low", "4CAF50", "Low-risk change")],
+    )
+
+    assert results == (LabelSyncResult("risk: low", "unchanged"),)
+    assert not existing.updates
+
+
 def test_sync_labels_url_encodes_names_for_lookup(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

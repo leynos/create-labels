@@ -1,19 +1,17 @@
-"""create-labels package."""
+"""Create and update GitHub repository labels."""
 
 from __future__ import annotations
 
-import importlib
-import typing as typ
+from .config import LabelConfig, LabelSpec, RepositorySpec, load_config
+from .defaults import DEFAULT_LABELS
+from .sync import LabelSyncResult, sync_labels
 
-if typ.TYPE_CHECKING:
-    import collections.abc as cabc
-
-PACKAGE_NAME = "create_labels"
-
-try:  # pragma: no cover - Rust optional
-    rust = importlib.import_module(f"._{PACKAGE_NAME}_rs", package=__name__)
-    hello = typ.cast("cabc.Callable[[], str]", rust.hello)
-except ModuleNotFoundError:  # pragma: no cover - Python fallback
-    from .pure import hello
-
-__all__ = ["hello"]
+__all__ = [
+    "DEFAULT_LABELS",
+    "LabelConfig",
+    "LabelSpec",
+    "LabelSyncResult",
+    "RepositorySpec",
+    "load_config",
+    "sync_labels",
+]

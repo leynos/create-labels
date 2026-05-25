@@ -1,43 +1,93 @@
 # create-labels Users' Guide
 
-## Quality Gates
+`create-labels` creates and updates GitHub repository labels from a TOML
+configuration file. When no labels are provided in configuration, it applies
+the default label set imported from Axinite's
+`.github/scripts/create-labels.sh` script.
 
-Generated projects use `make all` as the standard local quality gate. It runs
-these targets in order:
+## Command
 
-- `build`: create the local virtual environment and install development
-  dependencies with `uv sync --group dev`.
-- `check-fmt`: check Ruff formatting for Python sources and, when Rust is
-  enabled, `cargo fmt` for the Rust extension.
-- `lint`: run `lint-python` and, when Rust is enabled, `lint-rust`.
-- `typecheck`: run `ty check`.
-- `test`: run pytest and, when Rust is enabled, Rust tests.
+Install the package and run the console script:
 
-The `lint-python` target runs Ruff followed by Pylint via a PyPy-backed runner.
-The Pylint runner is installed through `uv tool run` from the pinned
-`pylint-pypy-shim` repository.
+```bash
+create-labels --repository owner/repo --token "$GITHUB_TOKEN"
+```
 
-When the Rust extension is enabled, `lint-rust` runs:
+The command uses `github3.py` for GitHub API access. It does not shell out to
+the GitHub CLI.
 
-- `cargo doc` with warnings denied;
-- `cargo clippy` with the generated Clippy configuration; and
-- Whitaker with `whitaker --all`.
+## Repository Selection
 
-The generated Makefile installs Whitaker on demand before local Rust linting
-when it is not already available.
+The target repository can be supplied in three ways, in priority order:
 
-## Rust Test Behaviour
+- `--repository owner/repo`;
+- `[repository]` in the TOML file; or
+- the `GITHUB_REPOSITORY` environment variable.
 
-Rust-enabled projects use `cargo nextest run` when `cargo-nextest` is available.
-If `cargo-nextest` is not installed, the generated `test` target falls back to
-`cargo test`. Rust documentation tests still run through `cargo test --doc`.
+## Authentication
 
-If cargo is missing from the local environment, generated Rust test targets fail
-early with a clear error instead of falling through to an unusable `cargo`
-invocation.
+Pass a token with `--token`, or set `GITHUB_TOKEN` in the environment:
 
-## Cleaning Local State
+```bash
+GITHUB_TOKEN=ghp_example create-labels --repository owner/repo
+```
 
-Run `make clean` to remove local build and cache outputs, including `.venv`,
-`.uv-cache`, `.uv-tools`, Python cache directories, coverage outputs, and Rust
-`target` output when the Rust extension is enabled.
+## GitHub Enterprise and Simulators
+
+Use `--api-url` to target GitHub Enterprise or a local GitHub API simulator:
+
+```bash
+create-labels --repository owner/repo --api-url http://127.0.0.1:3000
+```
+
+The same value can be stored as `github.api_url` in TOML.
+
+## TOML Configuration
+
+Each label must have a `name`. `color` and `description` are optional. Colours
+may include a leading `#`; they are normalised to the six-character hex form
+expected by GitHub.
+
+```toml
+[repository]
+owner = "leynos"
+name = "example"
+
+[github]
+api_url = "https://api.github.com"
+
+[[labels]]
+name = "risk: low"
+color = "4CAF50"
+description = "Changes to docs, tests, or low-risk modules"
+
+[[labels]]
+name = "needs-review"
+```
+
+Labels omitted from the file are not deleted from GitHub. The tool only creates
+missing labels and updates labels named in the effective configuration.
+
+## Default Labels
+
+If the TOML file contains no `[[labels]]` entries, the imported Axinite label
+set is used. It includes:
+
+- size labels;
+- risk labels;
+- scope labels;
+- workflow labels; and
+- contributor labels.
+
+## Local Quality Gates
+
+Use the Makefile targets for local validation:
+
+```bash
+make check-fmt
+make typecheck
+make lint
+make test
+```
+
+`make test` runs the unit tests and pytest-bdd behavioural scenarios.

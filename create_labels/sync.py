@@ -104,6 +104,7 @@ def _sync_label(
     repository: GitHubRepository,
     label: LabelSpec,
 ) -> LabelSyncResult:
+    """Synchronise one label and return its action."""
     existing_label = _find_label(repository, label.name)
     if existing_label is None:
         created_label = repository.create_label(
@@ -133,6 +134,7 @@ def _sync_label(
 
 
 def _find_label(repository: GitHubRepository, name: str) -> GitHubLabel | None:
+    """Return an existing label, URL-encoding ``name`` for github3.py."""
     try:
         return repository.label(urllib.parse.quote(name, safe=""))
     except NotFoundError:

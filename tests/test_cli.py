@@ -26,7 +26,13 @@ class SyncCall:
     close to the call site.
     """
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        results: tuple[LabelSyncResult, ...] = (
+            LabelSyncResult("risk: low", "created"),
+        ),
+    ) -> None:
+        self.results = results
         self.config: LabelConfig | None = None
         self.repository: RepositorySpec | None = None
         self.token: str | None = None
@@ -43,7 +49,7 @@ class SyncCall:
         self.repository = typ.cast("RepositorySpec | None", kwargs["repository"])
         self.token = typ.cast("str | None", kwargs["token"])
         self.api_url = typ.cast("str | None", kwargs["api_url"])
-        return (LabelSyncResult("risk: low", "created"),)
+        return self.results
 
 
 def test_main_loads_config_and_prints_sync_results(
@@ -88,6 +94,31 @@ def test_main_loads_config_and_prints_sync_results(
     assert capsys.readouterr().out == "created: risk: low\n", (
         "expected stdout to contain created result"
     )
+
+
+@pytest.mark.parametrize(
+    ("result", "expected_output"),
+    [
+        (LabelSyncResult("risk: low", "created"), "created: risk: low\n"),
+        (LabelSyncResult("risk: medium", "updated"), "updated: risk: medium\n"),
+        (
+            LabelSyncResult("risk: high", "unchanged"),
+            "unchanged: risk: high\n",
+        ),
+    ],
+)
+def test_main_prints_each_sync_result_action(
+    result: LabelSyncResult,
+    expected_output: str,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """The CLI prints every sync result action using stable text."""
+    monkeypatch.setattr(cli, "sync_repository_labels", SyncCall((result,)))
+
+    cli.main(repository="owner/repo")
+
+    assert capsys.readouterr().out == expected_output
 
 
 @pytest.mark.parametrize("repository", _MALFORMED_REPOSITORIES)

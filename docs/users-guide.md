@@ -16,6 +16,18 @@ create-labels --repository owner/repo --token "$GITHUB_TOKEN"
 The command uses `github3.py` for GitHub API access. It does not shell out to
 the GitHub CLI.
 
+## Configuration files
+
+Pass a TOML configuration file with `--config`:
+
+```bash
+create-labels --config labels.toml --repository owner/repo
+```
+
+When `--config` is omitted, the imported default labels are used. Repository,
+authentication, and API URL values can still come from CLI options or
+environment variables.
+
 ## Repository Selection
 
 The target repository can be supplied in three ways, in priority order:

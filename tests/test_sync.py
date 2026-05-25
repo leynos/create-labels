@@ -64,6 +64,17 @@ def test_sync_labels_normalizes_existing_label_fields_before_comparison() -> Non
     assert not existing.updates
 
 
+def test_sync_labels_preserves_null_descriptions_when_comparing() -> None:
+    """GitHub null descriptions match omitted ``LabelSpec`` descriptions."""
+    existing = make_fake_label("needs-review", "#abcdef", None)
+    repository = make_fake_repository([existing])
+
+    results = sync_labels(repository, [LabelSpec("needs-review", "ABCDEF")])
+
+    assert results == (LabelSyncResult("needs-review", "unchanged"),)
+    assert not existing.updates
+
+
 def test_sync_labels_url_encodes_names_for_lookup(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

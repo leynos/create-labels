@@ -31,10 +31,11 @@ class LabelApiHandler(BaseHTTPRequestHandler):
     """
 
     requests: typ.ClassVar[list[tuple[str, str]]]
+    request_lock: typ.ClassVar[threading.Lock]
 
     def do_GET(self) -> None:
         """Serve repository lookup and existing-label lookup."""
-        self.requests.append(("GET", self.path))
+        self._record_request("GET")
         if self.path == "/repos/octocat/hello-world":
             self._send_json(200, self._repository_payload())
             return
@@ -48,7 +49,7 @@ class LabelApiHandler(BaseHTTPRequestHandler):
 
     def do_PATCH(self) -> None:
         """Serve label updates."""
-        self.requests.append(("PATCH", self.path))
+        self._record_request("PATCH")
         request = self._read_json()
         self._send_json(
             200,
@@ -61,7 +62,7 @@ class LabelApiHandler(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None:
         """Serve label creation."""
-        self.requests.append(("POST", self.path))
+        self._record_request("POST")
         request = self._read_json()
         self._send_json(
             201,
@@ -83,6 +84,10 @@ class LabelApiHandler(BaseHTTPRequestHandler):
         length = int(self.headers.get("content-length", "0"))
         raw_body = self.rfile.read(length)
         return typ.cast("dict[str, object]", json.loads(raw_body.decode("utf-8")))
+
+    def _record_request(self, method: str) -> None:
+        with self.request_lock:
+            self.requests.append((method, self.path))
 
     def _send_json(self, status: int, payload: dict[str, object]) -> None:
         body = json.dumps(payload).encode("utf-8")
@@ -123,6 +128,7 @@ def test_sync_labels_uses_github3_requests_recorded_by_betamax(
 ) -> None:
     """Betamax records github3.py HTTP calls against a GitHub-shaped API."""
     LabelApiHandler.requests = []
+    LabelApiHandler.request_lock = threading.Lock()
     server = ThreadingHTTPServer(("127.0.0.1", 0), LabelApiHandler)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()

@@ -202,6 +202,7 @@ def parse_config(config: cabc.Mapping[str, typ.Any]) -> LabelConfig:
 
 
 def _parse_repository(raw_repository: object) -> RepositorySpec | None:
+    """Parse an optional repository table."""
     if raw_repository is None:
         return None
 
@@ -212,6 +213,7 @@ def _parse_repository(raw_repository: object) -> RepositorySpec | None:
 
 
 def _parse_api_url(raw_github: object) -> str | None:
+    """Parse an optional GitHub API URL table."""
     if raw_github is None:
         return None
 
@@ -230,6 +232,7 @@ def _parse_api_url(raw_github: object) -> str | None:
 
 
 def _parse_labels(raw_labels: object) -> tuple[LabelSpec, ...]:
+    """Parse optional label tables into label specs."""
     if raw_labels is None:
         return ()
     if not isinstance(raw_labels, list):
@@ -242,6 +245,7 @@ def _parse_labels(raw_labels: object) -> tuple[LabelSpec, ...]:
 
 
 def _parse_label(raw_label: object) -> LabelSpec:
+    """Parse one label table into a label spec."""
     label_table = _required_table(raw_label, "[[labels]]")
 
     description = label_table.get("description")
@@ -262,6 +266,7 @@ def _parse_label(raw_label: object) -> LabelSpec:
 
 
 def _required_table(value: object, context: str) -> cabc.Mapping[str, typ.Any]:
+    """Return ``value`` as a TOML table or raise ``ConfigError``."""
     if not isinstance(value, cabc.Mapping):
         msg = f"The {context} table must be a TOML table"
         raise ConfigError(msg)
@@ -273,6 +278,7 @@ def _required_string(
     key: str,
     context: str,
 ) -> str:
+    """Return a stripped required string field or raise ``ConfigError``."""
     raw_value = values.get(key)
     if not isinstance(raw_value, str) or not raw_value.strip():
         msg = f"{context}.{key} must be a non-empty string"
@@ -281,6 +287,7 @@ def _required_string(
 
 
 def _reject_duplicate_labels(labels: tuple[LabelSpec, ...]) -> None:
+    """Reject duplicate label names case-insensitively."""
     seen: set[str] = set()
     duplicates: set[str] = set()
     for label in labels:

@@ -45,7 +45,7 @@ The same value can be stored as `github.api_url` in TOML.
 ## TOML Configuration
 
 Each label must have a `name`. `color` and `description` are optional. Colours
-may include a leading `#`; they are normalised to the six-character hex form
+may include a leading `#`; they are normalized to the six-character hex form
 expected by GitHub.
 
 ```toml

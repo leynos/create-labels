@@ -72,8 +72,12 @@ def then_existing_label_is_updated(
 ) -> None:
     """Check the existing label was updated."""
     label = label_sync_context["repository"].labels[name]
-    assert label.updates == [LabelSpec(name, _LOW_RISK_COLOR, _LOW_RISK_DESC)]
-    assert LabelSyncResult(name, "updated") in label_sync_context["results"]
+    assert label.updates == [LabelSpec(name, _LOW_RISK_COLOR, _LOW_RISK_DESC)], (
+        f"expected updates to contain low-risk LabelSpec for {name}"
+    )
+    assert LabelSyncResult(name, "updated") in label_sync_context["results"], (
+        f"expected label sync results to include updated result for {name}"
+    )
 
 
 @then(parsers.parse('the missing "{name}" label is created'))
@@ -85,5 +89,7 @@ def then_missing_label_is_created(
     assert (
         LabelSpec(name, _HIGH_RISK_COLOR, _HIGH_RISK_DESC)
         in label_sync_context["repository"].created
+    ), f"expected created labels to contain {name} with correct color/desc"
+    assert LabelSyncResult(name, "created") in label_sync_context["results"], (
+        f"expected label sync results to include created result for {name}"
     )
-    assert LabelSyncResult(name, "created") in label_sync_context["results"]

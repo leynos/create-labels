@@ -67,6 +67,24 @@ def test_load_config_parses_repository_api_url_and_optional_label_fields(
     )
 
 
+def test_config_rejects_slash_only_api_url(tmp_path: pathlib.Path) -> None:
+    """Slash-only API URLs are empty after normalization and must fail."""
+    with pytest.raises(ConfigError, match=r"github\.api_url"):
+        parse_config({"github": {"api_url": "/"}})
+
+    config_path = tmp_path / "labels.toml"
+    config_path.write_text(
+        """
+        [github]
+        api_url = " / "
+        """,
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ConfigError, match=r"github\.api_url"):
+        load_config(config_path)
+
+
 def test_parse_config_rejects_duplicate_labels() -> None:
     """Duplicate label names would make sync order ambiguous."""
     with pytest.raises(ConfigError, match="Duplicate label definitions"):

@@ -36,6 +36,10 @@ if typ.TYPE_CHECKING:
 class GitHubLabel(typ.Protocol):
     """Subset of ``github3.issues.label.Label`` used by this package."""
 
+    name: str
+    color: str
+    description: str | None
+
     def update(self, name: str, color: str, description: str | None = None) -> bool:
         """Update this label in place."""
 
@@ -60,7 +64,7 @@ class LabelSyncResult:
     """Outcome of one label synchronisation operation."""
 
     name: str
-    action: typ.Literal["created", "updated"]
+    action: typ.Literal["created", "updated", "unchanged"]
 
 
 def sync_labels(
@@ -110,6 +114,15 @@ def _sync_label(
             msg = f"GitHub did not return a label after creating {label.name!r}"
             raise RuntimeError(msg)
         return LabelSyncResult(label.name, "created")
+
+    existing_values = (
+        existing_label.name,
+        existing_label.color,
+        existing_label.description,
+    )
+    desired_values = (label.name, label.color, label.description)
+    if existing_values == desired_values:
+        return LabelSyncResult(label.name, "unchanged")
 
     if not existing_label.update(label.name, label.color, label.description):
         msg = f"GitHub rejected update for label {label.name!r}"

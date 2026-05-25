@@ -112,6 +112,7 @@ def sync_repository_labels(
 
 
 def _login(token: str | None, api_url: str | None) -> github3.GitHub:
+    """Resolve token and API URL, then return a GitHub client."""
     resolved_token = token or os.environ.get("GITHUB_TOKEN")
     if not resolved_token:
         msg = "GitHub token must be provided via --token or GITHUB_TOKEN"
@@ -127,6 +128,7 @@ def _login(token: str | None, api_url: str | None) -> github3.GitHub:
 
 
 def _repository_from_env() -> RepositorySpec | None:
+    """Parse ``GITHUB_REPOSITORY`` into ``RepositorySpec`` or return None."""
     raw_repository = os.environ.get("GITHUB_REPOSITORY")
     if raw_repository is None:
         return None
@@ -139,6 +141,7 @@ def _repository_from_env() -> RepositorySpec | None:
 
 
 def _effective_labels(labels: cabc.Sequence[LabelSpec]) -> tuple[LabelSpec, ...]:
+    """Return provided labels as a tuple, or ``DEFAULT_LABELS``."""
     if labels:
         return tuple(labels)
     return DEFAULT_LABELS

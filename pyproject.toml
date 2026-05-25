@@ -22,7 +22,7 @@ dev = [
     "ty",
     "pytest-timeout",
     "pytest-xdist",
-    "simulacat @ git+https://github.com/leynos/simulacat",
+    "simulacat @ git+https://github.com/leynos/simulacat@3a62fe852a60e4060c0e17eb90a2dc0a117e143e",
     "betamax>=0.9.0",
 ]
 

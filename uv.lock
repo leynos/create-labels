@@ -152,7 +152,7 @@ dev = [
     { name = "pytest-timeout" },
     { name = "pytest-xdist" },
     { name = "ruff" },
-    { name = "simulacat", git = "https://github.com/leynos/simulacat" },
+    { name = "simulacat", git = "https://github.com/leynos/simulacat?rev=3a62fe852a60e4060c0e17eb90a2dc0a117e143e" },
     { name = "ty" },
 ]
 
@@ -581,7 +581,7 @@ wheels = [
 [[package]]
 name = "simulacat"
 version = "0.1.0"
-source = { git = "https://github.com/leynos/simulacat#3a62fe852a60e4060c0e17eb90a2dc0a117e143e" }
+source = { git = "https://github.com/leynos/simulacat?rev=3a62fe852a60e4060c0e17eb90a2dc0a117e143e#3a62fe852a60e4060c0e17eb90a2dc0a117e143e" }
 dependencies = [
     { name = "github3-py" },
 ]

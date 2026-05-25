@@ -33,12 +33,30 @@ _HEX_COLOR = re.compile(r"\A[0-9A-F]{6}\Z")
 
 
 class ConfigError(ValueError):
-    """Raised when a label configuration file is invalid."""
+    """Raised when a label configuration file is invalid.
+
+    Parameters
+    ----------
+    *args : object
+        Error message values passed to ``ValueError``.
+
+    """
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
 class RepositorySpec:
-    """GitHub repository coordinates."""
+    """GitHub repository coordinates.
+
+    Attributes
+    ----------
+    owner : str
+        GitHub account or organisation that owns the repository.
+    name : str
+        Repository name within ``owner``.
+    full_name : str
+        Property returning the canonical ``owner/name`` repository name.
+
+    """
 
     owner: str
     name: str
@@ -51,7 +69,30 @@ class RepositorySpec:
 
 @dataclasses.dataclass(frozen=True, slots=True)
 class LabelSpec:
-    """Desired state for a GitHub repository label."""
+    """Desired state for a GitHub repository label.
+
+    Attributes
+    ----------
+    name : str
+        Label name shown in GitHub.
+    color : str
+        Six-character hexadecimal label colour without a leading ``#``.
+    description : str | None
+        Optional label description shown in GitHub.
+
+    Raises
+    ------
+    ConfigError
+        Raised by ``__post_init__`` when ``name`` is empty or ``color`` is not
+        a valid six-character hexadecimal colour.
+
+    Notes
+    -----
+    ``__post_init__`` normalises ``name``, ``color``, and ``description`` by
+    trimming surrounding whitespace and converting colours to uppercase
+    six-character hexadecimal values.
+
+    """
 
     name: str
     color: str = DEFAULT_COLOR
@@ -77,7 +118,18 @@ class LabelSpec:
 
 @dataclasses.dataclass(frozen=True, slots=True)
 class LabelConfig:
-    """Complete label synchronisation configuration."""
+    """Complete label synchronisation configuration.
+
+    Attributes
+    ----------
+    repository : RepositorySpec | None
+        Optional repository coordinates from configuration.
+    labels : tuple[LabelSpec, ...]
+        Desired labels to create or update.
+    api_url : str | None
+        Optional GitHub API base URL.
+
+    """
 
     repository: RepositorySpec | None
     labels: tuple[LabelSpec, ...]
@@ -167,10 +219,14 @@ def _parse_api_url(raw_github: object) -> str | None:
     raw_api_url = github_table.get("api_url")
     if raw_api_url is None:
         return None
-    if not isinstance(raw_api_url, str) or not raw_api_url.strip():
+    if not isinstance(raw_api_url, str):
         msg = "github.api_url must be a non-empty string when provided"
         raise ConfigError(msg)
-    return raw_api_url.strip().rstrip("/")
+    normalized = raw_api_url.strip().rstrip("/")
+    if not normalized:
+        msg = "github.api_url must be a non-empty string when provided"
+        raise ConfigError(msg)
+    return normalized
 
 
 def _parse_labels(raw_labels: object) -> tuple[LabelSpec, ...]:

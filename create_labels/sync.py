@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import dataclasses
 import typing as typ
+import urllib.parse
 
 from github3.exceptions import NotFoundError
 
@@ -132,6 +133,6 @@ def _sync_label(
 
 def _find_label(repository: GitHubRepository, name: str) -> GitHubLabel | None:
     try:
-        return repository.label(name)
+        return repository.label(urllib.parse.quote(name, safe=""))
     except NotFoundError:
         return None

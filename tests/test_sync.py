@@ -6,7 +6,7 @@ import pytest
 
 from create_labels.config import LabelSpec
 from create_labels.sync import LabelSyncResult, sync_labels
-from tests.test_helpers import make_fake_label, make_fake_repository
+from tests.test_helpers import FakeLabel, make_fake_label, make_fake_repository
 
 
 def test_sync_labels_creates_missing_labels() -> None:
@@ -47,6 +47,33 @@ def test_sync_labels_leaves_matching_existing_labels_unchanged() -> None:
     )
 
     assert results == (LabelSyncResult("risk: low", "unchanged"),)
+    assert not existing.updates
+
+
+def test_sync_labels_url_encodes_names_for_lookup(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Slash-containing labels are looked up as one encoded path segment."""
+    existing = make_fake_label("scope: channel/cli", "1976D2", "CLI channel")
+    repository = make_fake_repository([existing])
+    lookups: list[str] = []
+
+    def label(name: str) -> FakeLabel | None:
+        lookups.append(name)
+        if name == "scope%3A%20channel%2Fcli":
+            return existing
+        return None
+
+    monkeypatch.setattr(repository, "label", label)
+
+    results = sync_labels(
+        repository,
+        [LabelSpec("scope: channel/cli", "1976D2", "CLI channel")],
+    )
+
+    assert lookups == ["scope%3A%20channel%2Fcli"]
+    assert results == (LabelSyncResult("scope: channel/cli", "unchanged"),)
+    assert not repository.created
     assert not existing.updates
 
 

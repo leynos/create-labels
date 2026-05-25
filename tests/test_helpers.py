@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import urllib.parse
+
 from create_labels.config import LabelSpec
 
 
@@ -32,7 +34,7 @@ class FakeRepository:
 
     def label(self, name: str) -> FakeLabel | None:
         """Return an existing label or None."""
-        return self.labels.get(name)
+        return self.labels.get(urllib.parse.unquote(name))
 
     def create_label(
         self,

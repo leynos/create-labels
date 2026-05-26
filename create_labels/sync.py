@@ -4,13 +4,13 @@ The module compares configured ``LabelSpec`` instances with repository labels
 and creates missing labels or updates existing labels. It deliberately does not
 delete labels that are absent from the desired set.
 
-The lightweight ``Protocol`` interfaces model the small github3.py surface used
+The lightweight ``Protocol`` interfaces model the small repository surface used
 by this package, which keeps unit and behavioural tests independent from live
 GitHub objects.
 
 Example
 -------
-Synchronise two labels against a github3.py repository object::
+Synchronise two labels against a repository-like object::
 
     results = sync_labels(github_repository, (LabelSpec("risk: low"),))
 
@@ -24,9 +24,6 @@ from __future__ import annotations
 
 import dataclasses
 import typing as typ
-import urllib.parse
-
-from github3.exceptions import NotFoundError
 
 if typ.TYPE_CHECKING:
     import collections.abc as cabc
@@ -134,8 +131,5 @@ def _sync_label(
 
 
 def _find_label(repository: GitHubRepository, name: str) -> GitHubLabel | None:
-    """Return an existing label, URL-encoding ``name`` for github3.py."""
-    try:
-        return repository.label(urllib.parse.quote(name, safe=""))
-    except NotFoundError:
-        return None
+    """Return an existing label from the repository."""
+    return repository.label(name)

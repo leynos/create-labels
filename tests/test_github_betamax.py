@@ -14,6 +14,7 @@ from betamax import Betamax
 from github3.session import GitHubSession
 
 from create_labels.config import LabelSpec
+from create_labels.github import _GitHubRepositoryAdapter
 from create_labels.sync import LabelSyncResult, sync_labels
 
 _PAYLOAD_FIXTURE = (
@@ -144,11 +145,13 @@ def test_sync_labels_uses_github3_requests_recorded_by_betamax(
         LabelSyncResult("risk: low", "updated"),
         LabelSyncResult("risk: high", "created"),
     )
+    with LabelApiHandler.request_lock:
+        recorded = list(LabelApiHandler.requests)
     assert (
         "PATCH",
         "/repos/octocat/hello-world/labels/risk:%20low",
-    ) in LabelApiHandler.requests
-    assert ("POST", "/repos/octocat/hello-world/labels") in LabelApiHandler.requests
+    ) in recorded
+    assert ("POST", "/repos/octocat/hello-world/labels") in recorded
 
 
 def _sync_with_betamax(
@@ -166,7 +169,7 @@ def _sync_with_betamax(
         repository = github.repository("octocat", "hello-world")
         assert repository is not None
         return sync_labels(
-            repository,
+            _GitHubRepositoryAdapter(repository),
             (
                 LabelSpec("risk: low", "4CAF50", "Low risk"),
                 LabelSpec("risk: high", "F44336", "High risk"),

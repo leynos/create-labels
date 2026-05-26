@@ -29,13 +29,15 @@ from __future__ import annotations
 
 import os
 import typing as typ
+import urllib.parse
 
 import github3
+from github3.exceptions import NotFoundError
 from github3.session import GitHubSession
 
 from .config import LabelConfig, RepositorySpec
 from .defaults import DEFAULT_LABELS
-from .sync import LabelSyncResult, sync_labels
+from .sync import GitHubLabel, LabelSyncResult, sync_labels
 
 if typ.TYPE_CHECKING:
     import collections.abc as cabc
@@ -47,6 +49,21 @@ DEFAULT_API_URL = "https://api.github.com"
 
 class GitHubError(RuntimeError):
     """Raised when GitHub configuration or API access fails."""
+
+
+class _Github3Repository(typ.Protocol):
+    """github3.py repository methods used by the adapter."""
+
+    def label(self, name: str) -> GitHubLabel | None:
+        """Return a label by name."""
+
+    def create_label(
+        self,
+        name: str,
+        color: str,
+        description: str | None = None,
+    ) -> GitHubLabel | None:
+        """Create a label."""
 
 
 def sync_repository_labels(
@@ -108,7 +125,32 @@ def sync_repository_labels(
         raise GitHubError(msg)
 
     labels = _effective_labels(config.labels)
-    return sync_labels(github_repository, labels)
+    return sync_labels(_GitHubRepositoryAdapter(github_repository), labels)
+
+
+class _GitHubRepositoryAdapter:
+    """Translate github3.py repository behaviour into the sync protocol."""
+
+    def __init__(self, repository: _Github3Repository) -> None:
+        """Store the github3.py repository object to adapt."""
+        self._repository = repository
+
+    def label(self, name: str) -> GitHubLabel | None:
+        """Return a label or None when github3.py reports it missing."""
+        try:
+            encoded_name = urllib.parse.quote(name, safe="")
+            return self._repository.label(encoded_name)
+        except NotFoundError:
+            return None
+
+    def create_label(
+        self,
+        name: str,
+        color: str,
+        description: str | None = None,
+    ) -> GitHubLabel | None:
+        """Create a repository label through github3.py."""
+        return self._repository.create_label(name, color, description)
 
 
 def _login(token: str | None, api_url: str | None) -> github3.GitHub:

@@ -75,17 +75,17 @@ def test_sync_labels_preserves_null_descriptions_when_comparing() -> None:
     assert not existing.updates
 
 
-def test_sync_labels_url_encodes_names_for_lookup(
+def test_sync_labels_uses_raw_names_for_repository_lookup(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Slash-containing labels are looked up as one encoded path segment."""
+    """Repository adapters own any transport-specific label-name encoding."""
     existing = make_fake_label("scope: channel/cli", "1976D2", "CLI channel")
     repository = make_fake_repository([existing])
     lookups: list[str] = []
 
     def label(name: str) -> FakeLabel | None:
         lookups.append(name)
-        if name == "scope%3A%20channel%2Fcli":
+        if name == "scope: channel/cli":
             return existing
         return None
 
@@ -96,7 +96,7 @@ def test_sync_labels_url_encodes_names_for_lookup(
         [LabelSpec("scope: channel/cli", "1976D2", "CLI channel")],
     )
 
-    assert lookups == ["scope%3A%20channel%2Fcli"]
+    assert lookups == ["scope: channel/cli"]
     assert results == (LabelSyncResult("scope: channel/cli", "unchanged"),)
     assert not repository.created
     assert not existing.updates

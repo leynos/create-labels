@@ -22,7 +22,10 @@
 
 - **Reference:** Use the markdown files within the `docs/` directory as a
   knowledge base and source of truth for project requirements, dependency
-  choices, and architectural decisions.
+  choices, and architectural decisions. Start with
+  [documentation contents](docs/contents.md) and
+  [repository layout](docs/repository-layout.md) when orienting within the
+  project.
 - **Update:** When new decisions are made, requirements change, libraries are
   added/removed, or architectural patterns evolve, **proactively update** the
   relevant file(s) in the `docs/` directory to reflect the latest state. Ensure

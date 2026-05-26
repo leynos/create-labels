@@ -32,7 +32,7 @@ class LabelApiHandler(BaseHTTPRequestHandler):
     """
 
     requests: typ.ClassVar[list[tuple[str, str]]]
-    request_lock: typ.ClassVar[threading.Lock]
+    _requests_lock: typ.ClassVar[threading.Lock]
 
     def do_GET(self) -> None:
         """Serve repository lookup and existing-label lookup."""
@@ -87,7 +87,7 @@ class LabelApiHandler(BaseHTTPRequestHandler):
         return typ.cast("dict[str, object]", json.loads(raw_body.decode("utf-8")))
 
     def _record_request(self, method: str) -> None:
-        with self.request_lock:
+        with self.__class__._requests_lock:
             self.requests.append((method, self.path))
 
     def _send_json(self, status: int, payload: dict[str, object]) -> None:
@@ -129,7 +129,7 @@ def test_sync_labels_uses_github3_requests_recorded_by_betamax(
 ) -> None:
     """Betamax records github3.py HTTP calls against a GitHub-shaped API."""
     LabelApiHandler.requests = []
-    LabelApiHandler.request_lock = threading.Lock()
+    LabelApiHandler._requests_lock = threading.Lock()
     server = ThreadingHTTPServer(("127.0.0.1", 0), LabelApiHandler)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
@@ -145,7 +145,7 @@ def test_sync_labels_uses_github3_requests_recorded_by_betamax(
         LabelSyncResult("risk: low", "updated"),
         LabelSyncResult("risk: high", "created"),
     )
-    with LabelApiHandler.request_lock:
+    with LabelApiHandler._requests_lock:
         recorded = list(LabelApiHandler.requests)
     assert (
         "PATCH",

@@ -8,8 +8,11 @@ from create_labels.config import LabelConfig, RepositorySpec
 from create_labels.github import GitHubError, sync_repository_labels
 
 
-def test_sync_repository_labels_requires_repository() -> None:
+def test_sync_repository_labels_requires_repository(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     """Repository coordinates must come from CLI, config, or environment."""
+    monkeypatch.delenv("GITHUB_REPOSITORY", raising=False)
     auth_value = "sample-auth-value"
 
     with pytest.raises(GitHubError, match="Repository must be provided"):

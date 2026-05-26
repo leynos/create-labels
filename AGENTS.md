@@ -27,6 +27,15 @@
   added/removed, or architectural patterns evolve, **proactively update** the
   relevant file(s) in the `docs/` directory to reflect the latest state. Ensure
   the documentation remains accurate and current.
+- **Design decisions:** Record design decisions in the relevant design
+  document. When a decision is substantive, capture it in an Architectural
+  Decision Record (ADR) following the documentation style guide, and reference
+  that ADR from the design document.
+- **User-facing behaviour:** Update [users' guide](docs/users-guide.md) for
+  behaviour or user-interface changes that users should know about.
+- **Internal interfaces:** Document internally facing interfaces in the
+  relevant component architecture document. Document internally facing
+  conventions and practices in [developers' guide](docs/developers-guide.md).
 - **Style:** All documentation must adhere to the
   [documentation style guide](docs/documentation-style-guide.md).
 
@@ -36,9 +45,22 @@ When implementing changes, adhere to the following testing procedures:
 
 - **New Functionality:**
   - Implement unit tests covering all new code units (functions, components,
-    classes). Implement tests **before** implementing the unit.
-  - Implement behavioral tests that verify the end-to-end behavior of the new
-    feature from a user interaction perspective.
+    classes) using `pytest`. Implement tests **before** implementing the unit.
+  - Implement behavioural tests using `pytest-bdd` that verify the
+    end-to-end behaviour of the new feature from a user interaction
+    perspective.
+  - Add snapshot tests using `syrupy` where output format consistency is
+    relevant to the requirements.
+  - Add end-to-end tests when the change affects externally observable
+    workflows, integration contracts, persistence, command-line behaviour,
+    network boundaries, UI flows, or other system-level behaviour.
+  - Add property tests using `hypothesis`, or a bounded model checker such as
+    CrossHair, when the change introduces an invariant over a range of inputs,
+    states, orderings, or transitions.
+  - For introduced axioms or contractual business logic, prefer provable code
+    in a Rust extension when an exhaustive proof, for example using Verus, is
+    suitable. Any proof must be substantive, rigorous, and well-founded, not
+    merely a restatement of the assumed property.
   - Ensure both unit and behavioral tests pass before considering the
     functionality complete.
   - Ensure that new functionality is clearly documented in the

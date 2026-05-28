@@ -10,7 +10,7 @@ GitHub objects.
 
 Example
 -------
-Synchronise two labels against a repository-like object::
+Synchronize two labels against a repository-like object::
 
     results = sync_labels(github_repository, (LabelSpec("risk: low"),))
 

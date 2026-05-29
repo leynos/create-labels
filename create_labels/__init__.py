@@ -1,19 +1,28 @@
-"""create-labels package."""
+"""Public API for create-labels.
+
+The package root is the stable import boundary for library consumers. It
+re-exports typed configuration values from ``create_labels.config``, the
+imported default label set from ``create_labels.defaults``, and the pure label
+synchronization function and result type from ``create_labels.sync``.
+
+Use these exports when embedding create-labels in tests, scripts, or other
+tools. The submodules keep parsing, default data, GitHub integration, and sync
+decisions separate, while this module provides the small public surface that
+callers should depend on.
+"""
 
 from __future__ import annotations
 
-import importlib
-import typing as typ
+from .config import LabelConfig, LabelSpec, RepositorySpec, load_config
+from .defaults import DEFAULT_LABELS
+from .sync import LabelSyncResult, sync_labels
 
-if typ.TYPE_CHECKING:
-    import collections.abc as cabc
-
-PACKAGE_NAME = "create_labels"
-
-try:  # pragma: no cover - Rust optional
-    rust = importlib.import_module(f"._{PACKAGE_NAME}_rs", package=__name__)
-    hello = typ.cast("cabc.Callable[[], str]", rust.hello)
-except ModuleNotFoundError:  # pragma: no cover - Python fallback
-    from .pure import hello
-
-__all__ = ["hello"]
+__all__ = [
+    "DEFAULT_LABELS",
+    "LabelConfig",
+    "LabelSpec",
+    "LabelSyncResult",
+    "RepositorySpec",
+    "load_config",
+    "sync_labels",
+]

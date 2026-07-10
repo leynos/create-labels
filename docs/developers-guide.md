@@ -75,6 +75,7 @@ Use Makefile targets for validation:
 make fmt
 make check-fmt
 make markdownlint
+make spelling
 make nixie
 make typecheck
 make lint
@@ -83,3 +84,8 @@ make test
 
 Run the same gates before committing. The Makefile provisions the virtual
 environment through `uv` and runs pytest with the configured worker count.
+
+The spelling gate refreshes the shared en-GB-oxendict dictionary into an
+untracked local cache only when the authoritative copy is newer, merges the
+repository-specific policy in `typos.local.toml`, and regenerates the tracked
+`typos.toml`. Edit the local policy rather than the generated configuration.

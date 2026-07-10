@@ -64,14 +64,14 @@ When implementing changes, adhere to the following testing procedures:
     in a Rust extension when an exhaustive proof, for example using Verus, is
     suitable. Any proof must be substantive, rigorous, and well-founded, not
     merely a restatement of the assumed property.
-  - Ensure both unit and behavioral tests pass before considering the
+  - Ensure both unit and behavioural tests pass before considering the
     functionality complete.
   - Ensure that new functionality is clearly documented in the
     [users' guide](docs/users-guide.md).
   - Ensure that any design decisions made are recorded in the relevant design
     document.
 - **Bug Fixes:**
-  - Before fixing the bug, write a new test (unit or behavioral, whichever is
+  - Before fixing the bug, write a new test (unit or behavioural, whichever is
     most appropriate) that specifically targets and reproduces the bug. This
     test should initially fail.
   - Implement the bug fix.
@@ -79,9 +79,9 @@ When implementing changes, adhere to the following testing procedures:
   - Ensure that any design decisions made are recorded in the relevant design
     document.
 - **Modifying Existing Functionality:**
-  - Identify the existing behavioral and unit tests relevant to the
+  - Identify the existing behavioural and unit tests relevant to the
     functionality being changed.
-  - **First, modify the tests** to reflect the new requirements or behavior.
+  - **First, modify the tests** to reflect the new requirements or behaviour.
   - Run the tests; they should now fail.
   - Implement the code changes to the functionality.
   - Verify that the modified tests (and all other existing tests) now pass.
@@ -90,12 +90,12 @@ When implementing changes, adhere to the following testing procedures:
   - Ensure that any design decisions made are recorded in the relevant design
     document.
 - **Refactoring:**
-  - Identify or create a behavioral test that covers the functionality being
+  - Identify or create a behavioural test that covers the functionality being
     refactored. Ensure this test passes **before** starting the refactor.
   - Perform the refactoring (e.g., extracting logic into a new unit).
   - If new units are created (e.g., a new function or component), add unit
     tests for these extracted units.
-  - After the refactor, ensure the original behavioral test **still passes**
+  - After the refactor, ensure the original behavioural test **still passes**
     without modification. Also ensure any new unit tests pass.
 
 ## Change Quality & Committing
@@ -105,7 +105,7 @@ When implementing changes, adhere to the following testing procedures:
 - **Quality Gates:** Before considering a change complete or proposing a
   commit, ensure it meets the following criteria:
   - For Python files:
-    - **Testing:** Passes all relevant unit and behavioral tests according to
+    - **Testing:** Passes all relevant unit and behavioural tests according to
       the guidelines above (run `make test` to verify).
     - **Linting:** Passes lint checks (`make lint`).
     - **Formatting:** Adheres to formatting standards (run `make check-fmt` to
@@ -157,13 +157,17 @@ When implementing changes, adhere to the following testing procedures:
 - **Separate Atomic Refactors:** If refactoring is deemed necessary:
   - Perform the refactoring as a **separate, atomic commit** *after* the
     functional change commit.
-  - Ensure the refactoring adheres to the testing guidelines (behavioral tests
+  - Ensure the refactoring adheres to the testing guidelines (behavioural tests
     pass before and after, unit tests added for new units).
   - Ensure the refactoring commit itself passes all quality gates.
 
 ## Markdown Guidance
 
 - Validate Markdown files using `make markdownlint`.
+- Run `make spelling` to refresh the shared en-GB-oxendict base, regenerate
+  `typos.toml`, and check maintained Markdown with the pinned `typos` release.
+  Put narrow repository-only exceptions in `typos.local.toml`; never edit the
+  generated configuration by hand.
 - Run `make fmt` after any documentation changes to format all Markdown
   files and fix table markup.
 - Validate Mermaid diagrams in Markdown files by running `make nixie`.

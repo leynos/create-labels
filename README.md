@@ -1,5 +1,8 @@
 # create-labels
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](
+https://deepwiki.com/leynos/create-labels)
+
 `create-labels` creates and updates GitHub repository labels from a TOML
 configuration file or from the built-in df12 label set. It is a small Python
 command-line tool for making label setup repeatable across repositories without

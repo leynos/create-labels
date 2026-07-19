@@ -67,6 +67,66 @@ The test suite has three levels:
 Prefer focused unit tests for parser and sync changes. Add behaviour coverage
 when a change affects user-visible workflows.
 
+## Mutation-testing workflow contract tests
+
+This repository runs scheduled, informational mutation testing through a thin
+caller workflow,
+[`.github/workflows/mutation-testing.yml`](../.github/workflows/mutation-testing.yml),
+which delegates to the shared reusable workflow
+`leynos/shared-actions/.github/workflows/mutation-mutmut.yml`. The heavy
+lifting — running `mutmut`, and summarizing survivors — lives in
+`shared-actions`; this repository carries only declarative configuration. The
+run is **informational only**: it never gates a pull request. Survivors are
+reported through the job summary and downloadable artefacts so they can be
+triaged into tests, not enforced as a blocking check. The mutation targets and
+test selection themselves are configured in `[tool.mutmut]` in `pyproject.toml`
+(`source_paths`, `pytest_add_cli_args_test_selection`).
+
+The workflow runs in two modes. A **daily schedule** fires a change-scoped run
+that mutates only the source files touched within the detection window, so
+quiet days are cheap no-ops. A **manual dispatch** (the Actions "Run workflow"
+control) mutates the whole package; select a branch in that control to exercise
+a feature branch.
+
+The caller passes the flat-layout configuration this package needs:
+
+- `paths` — set to `create_labels/`, the change-detection glob that decides
+  whether a scheduled run has anything to mutate.
+- `module-prefix-strip` — set to an empty string, because the mutable source
+  lives directly under `create_labels/` rather than under a `src/` prefix.
+
+The `uses:` reference pins the shared workflow to a full 40-character commit
+SHA rather than a branch or tag, so a force-push upstream cannot silently
+change what runs here. The contract test hard-codes the expected SHA in a
+`PINNED_SHA` constant and asserts the `uses:` line matches it, so bumping the
+pin means editing the workflow's `uses:` line and that constant together in the
+same change.
+
+Because the caller is configuration rather than code, a contract test in
+`tests/test_workflow_contract.py` pins the shape it must uphold, failing the
+pull request when the caller drifts — repointing the pin at a branch, widening
+the token scope, or dropping a configuration input — rather than letting the
+breakage surface only in a scheduled run. The test module self-skips when the
+workflow file is absent (mutmut copies the sources into a sandbox that omits
+`.github/`, so the contract test does not run there). Run it locally with:
+
+```bash
+uv run --with pytest --with pyyaml pytest tests/test_workflow_contract.py -q
+```
+
+The test validates:
+
+- the `uses:` reference targets `mutation-mutmut.yml` pinned to the documented
+  commit SHA;
+- the `with:` block carries exactly `paths` and `module-prefix-strip`, the
+  flat-layout configuration above;
+- job permissions are least-privilege (`contents: read`, `id-token: write`)
+  and the workflow-level default token scope is empty;
+- `concurrency` serializes runs per ref without cancelling one in progress;
+  and
+- the triggers keep the daily schedule and a plain `workflow_dispatch` with no
+  inputs.
+
 ## Local workflow
 
 Use Makefile targets for validation:

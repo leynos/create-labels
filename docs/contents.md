@@ -10,8 +10,8 @@ reference material.
   repository selection, authentication, GitHub Enterprise and simulator usage,
   TOML label configuration, default labels, and local quality gates.
 - [Developers' guide](developers-guide.md): package architecture, module
-  organization, data flow, normalization rules, testing strategy, and local
-  development workflow.
+  organization, data flow, normalization rules, testing strategy, local
+  development workflow, and mutation-testing workflow contract tests.
 - [Repository layout](repository-layout.md): top-level directories and files,
   package modules, tests, generated artefacts, and maintenance expectations.
 

@@ -67,7 +67,6 @@ The test suite has three levels:
 Prefer focused unit tests for parser and sync changes. Add behaviour coverage
 when a change affects user-visible workflows.
 
-
 ## Mutation-testing workflow contract tests
 
 This repository runs scheduled, informational mutation testing through a thin
@@ -98,10 +97,9 @@ The caller passes the flat-layout configuration this package needs:
 
 The `uses:` reference pins the shared workflow to a full 40-character commit
 SHA rather than a branch or tag, so a force-push upstream cannot silently
-change what runs here. The contract test hard-codes the expected SHA in a
-`PINNED_SHA` constant and asserts the `uses:` line matches it, so bumping the
-pin means editing the workflow's `uses:` line and that constant together in the
-same change.
+change what runs here. The contract test verifies the reusable-workflow path
+and SHA shape but deliberately does not assert the SHA value: Dependabot owns
+pin updates, which should not require a matching hand-edited test constant.
 
 Because the caller is configuration rather than code, a contract test in
 `tests/test_workflow_contract.py` pins the shape it must uphold, failing the
@@ -117,8 +115,8 @@ uv run --with pytest --with pyyaml pytest tests/test_workflow_contract.py -q
 
 The test validates:
 
-- the `uses:` reference targets `mutation-mutmut.yml` pinned to the documented
-  commit SHA;
+- the `uses:` reference targets `mutation-mutmut.yml` pinned to a full
+  40-character commit SHA;
 - the `with:` block carries exactly `paths` and `module-prefix-strip`, the
   flat-layout configuration above;
 - job permissions are least-privilege (`contents: read`, `id-token: write`)

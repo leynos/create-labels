@@ -93,7 +93,7 @@ The caller passes the flat-layout configuration this package needs:
 
 - `paths` — set to `create_labels/`, the change-detection glob that decides
   whether a scheduled run has anything to mutate.
-- `module-prefix-strip` — set to an empty string, because the mutable source
+- `module-prefix-strip` — set to an empty string because the mutable source
   lives directly under `create_labels/` rather than under a `src/` prefix.
 
 The `uses:` reference pins the shared workflow to a full 40-character commit

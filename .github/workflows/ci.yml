@@ -22,7 +22,7 @@ jobs:
           python-version: '3.13'
 
       - name: Install uv
-        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
 
       
       - name: Install CLI tools
@@ -49,7 +49,7 @@ jobs:
         run: make typecheck
 
       - name: Test and Measure Coverage
-        uses: leynos/shared-actions/.github/actions/generate-coverage@47b337e4f230b591891656534d4ffad868131740
+        uses: leynos/shared-actions/.github/actions/generate-coverage@824724a791a7f6dfef79bf95e11ea744b6eb4de4
         with:
           output-path: coverage.xml
           format: cobertura

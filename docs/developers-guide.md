@@ -67,6 +67,20 @@ The test suite has three levels:
 Prefer focused unit tests for parser and sync changes. Add behaviour coverage
 when a change affects user-visible workflows.
 
+## Coverage workflow contract
+
+Pull-request CI generates Python coverage locally and ratchets it against the
+baseline written by `coverage-main.yml`. It runs serially so that the
+pull-request and main measurements use the same execution model. Pull-request
+jobs do not invoke CodeScene, expose `CS_ACCESS_TOKEN`, or require a full Git
+history.
+
+`coverage-main.yml` runs after pushes to `main`. It generates the same
+source-scoped, serial coverage report, saves the updated ratchet baseline, and
+publishes the report to CodeScene using the repository secret. Keeping
+publication on main gives every pull request one authoritative baseline while
+keeping the publication credential out of pull-request jobs.
+
 ## Mutation-testing workflow contract tests
 
 This repository runs scheduled, informational mutation testing through a thin

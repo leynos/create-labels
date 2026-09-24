@@ -15,6 +15,12 @@ reference material.
 - [Repository layout](repository-layout.md): top-level directories and files,
   package modules, tests, generated artefacts, and maintenance expectations.
 
+## Architectural decision records
+
+- [ADR 001: Publish CodeScene coverage from main](adr-001-publish-codescene-coverage-from-main.md):
+  why coverage is uploaded only from `main`, and why a dispatch cannot advance
+  the ratchet baseline.
+
 ## Standards and references
 
 - [Documentation style guide](documentation-style-guide.md): spelling,

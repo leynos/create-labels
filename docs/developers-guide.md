@@ -114,6 +114,8 @@ of the CodeScene host, uploader, client, or token there. They also refuse
 `continue-on-error` wherever it would turn a failed ratchet or upload green.
 Each clause has a test that mutates the workflows and expects the clause to
 refuse the result.
+[ADR 001](adr-001-publish-codescene-coverage-from-main.md) records why
+publication moved to `main` and why a dispatch cannot advance the baseline.
 
 ## Mutation-testing workflow contract tests
 

@@ -13,7 +13,10 @@ accepted = [
 [words.corrections]
 
 [patterns]
-ignore = []
+ignore = [
+  "`color`",
+  "--artifact-server-path",
+]
 
 [files]
 exclude = []

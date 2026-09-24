@@ -61,6 +61,7 @@ Documentation lives under `docs/`:
 - `developers-guide.md`: maintainer-facing architecture and workflow guidance.
 - `repository-layout.md`: this repository structure reference.
 - `documentation-style-guide.md`: documentation writing and ADR conventions.
+- `adr-NNN-*.md`: architectural decision records.
 - `scripting-standards.md`: standards for scripts and automation.
 - `local-validation-of-github-actions-with-act-and-pytest.md`: local workflow
   validation guidance.

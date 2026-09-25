@@ -14,6 +14,7 @@ violations.
 from __future__ import annotations
 
 import typing as typ
+from pathlib import PurePosixPath
 
 from codescene_workflow_reader import (
     Document,
@@ -117,7 +118,8 @@ def local_action(reference: str, actions: dict[str, Document]) -> str | None:
     """Return the local action a step's `uses:` names in this tree.
 
     Matched by shape, as `local_callee` matches a workflow: a `./` or `$/`
-    reference names the directory holding the action's metadata.
+    reference names the directory holding the action's metadata. The path is
+    normalized first, so `./a/./b/` and `./a/b` name the same action.
 
     Parameters
     ----------
@@ -141,7 +143,7 @@ def local_action(reference: str, actions: dict[str, Document]) -> str | None:
     path = _local_path(reference, "action")
     if not reference.startswith(("./", "$/")):
         return None
-    path = path.rstrip("/")
+    path = PurePosixPath(path).as_posix()
     if path not in actions:
         message = f"{reference} names no action in this repository"
         raise WorkflowError(message)

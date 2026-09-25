@@ -121,6 +121,15 @@ def test_closure_follows_a_nested_local_action(documents: Documents) -> None:
     assert expected in found, f"missing {expected!r} in {found}"
 
 
+def test_closure_normalizes_a_local_action_path(documents: Documents) -> None:
+    """A redundant `.` component still names the same checked-out action."""
+    actions = fresh_actions()
+    actions[ACTION] = _composite(LEAK)
+    job_steps(documents[LANE]).append({"uses": "./.github/actions/./probe"})
+    found = _contacts(documents, actions)
+    assert f"{ACTION} names the CodeScene host" in found, f"missed in {found}"
+
+
 def test_unreached_local_action_stays_off_the_surface(documents: Documents) -> None:
     """The action rule is narrow: an action no PR step runs is not judged."""
     actions = fresh_actions()

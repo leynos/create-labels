@@ -124,7 +124,7 @@ def local_action(reference: str, actions: dict[str, Document]) -> str | None:
     reference : str
         A step's `uses:` value.
     actions : dict of str to Document
-        Every local action under `.github`, keyed by its directory.
+        Every local action in the repository, keyed by its directory.
 
     Returns
     -------
@@ -135,7 +135,7 @@ def local_action(reference: str, actions: dict[str, Document]) -> str | None:
     ------
     WorkflowError
         If the reference is a qualified self-reference, a `$/` reference with a
-        ref, or names a local directory holding no action under `.github`.
+        ref, or names a local directory holding no action.
 
     """
     path = _local_path(reference, "action")
@@ -143,7 +143,7 @@ def local_action(reference: str, actions: dict[str, Document]) -> str | None:
         return None
     path = path.rstrip("/")
     if path not in actions:
-        message = f"{reference} names no action under .github in this repository"
+        message = f"{reference} names no action in this repository"
         raise WorkflowError(message)
     return path
 
@@ -177,7 +177,7 @@ def action_closure(
     documents : dict of str to Document
         The workflows whose steps to follow, keyed by file name.
     actions : dict of str to Document
-        Every local action under `.github`, keyed by its directory.
+        Every local action in the repository, keyed by its directory.
 
     Returns
     -------
@@ -360,7 +360,7 @@ def pull_request_contacts(
     documents : dict of str to Document
         Every workflow in the repository, keyed by file name.
     actions : dict of str to Document
-        Every local action under `.github`, keyed by its directory.
+        Every local action in the repository, keyed by its directory.
 
     Returns
     -------

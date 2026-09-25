@@ -7,6 +7,7 @@ over an empty subject set, so each refusal here is a clause of the contract.
 
 from __future__ import annotations
 
+import pathlib
 import typing as typ
 
 import pytest
@@ -14,6 +15,7 @@ from codescene_workflow_files import read_actions, read_workflows
 from codescene_workflow_reader import WorkflowError, load_workflow
 
 if typ.TYPE_CHECKING:
+    import collections.abc as cabc
     from pathlib import Path
 
 
@@ -37,23 +39,35 @@ def test_reader_skips_hidden_and_vendored_directories(tmp_path: Path) -> None:
     assert not read_actions(tmp_path), "a skipped directory was searched"
 
 
-def test_reader_refuses_a_directory_it_cannot_search(tmp_path: Path) -> None:
-    """An unreadable directory could hide an action, so it is not skipped."""
-    locked = tmp_path / "tools"
-    locked.mkdir()
-    locked.chmod(0)
-    try:
-        with pytest.raises(WorkflowError, match="cannot search"):
-            read_actions(tmp_path)
-    finally:
-        locked.chmod(0o700)
+def test_reader_refuses_a_directory_it_cannot_search(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """An unreadable directory could hide an action, so it is not skipped.
+
+    The walk error is injected rather than made with permission bits, which a
+    privileged process or another platform would ignore.
+    """
+
+    def failing_walk(
+        self: pathlib.Path,
+        *_: object,
+        on_error: cabc.Callable[[OSError], object] | None = None,
+        **__: object,
+    ) -> cabc.Iterator[tuple[pathlib.Path, list[str], list[str]]]:
+        if on_error is not None:
+            on_error(PermissionError(13, "Permission denied", str(self / "tools")))
+        yield from ()
+
+    monkeypatch.setattr(pathlib.Path, "walk", failing_walk)
+    with pytest.raises(WorkflowError, match="cannot search"):
+        read_actions(tmp_path)
 
 
 @pytest.mark.parametrize(
     ("content", "reason"),
     [
-        (b"\xff\xfe", "cannot be read as UTF-8"),
-        (b"runs: [\n", "not valid YAML"),
+        (b"\xff\xfe", r"^action\.yml: cannot be read as UTF-8"),
+        (b"runs: [\n", r"^\.github/actions/bad/action\.yml: not valid YAML"),
     ],
 )
 def test_reader_names_an_unreadable_action(

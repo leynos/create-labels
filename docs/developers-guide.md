@@ -118,6 +118,15 @@ upload green.
 Each clause has a test that mutates the workflows and expects the clause to
 refuse the result.
 
+Both coverage lanes set up Python 3.14 with `actions/setup-python`, inside the
+project's `requires-python` (`>=3.14`). generate-coverage builds the coverage
+environment on the Python the job put on `PATH` unless the job names one, and
+`uv sync` refuses an interpreter outside `requires-python`. So
+`tests/test_coverage_python_version.py` requires every job that runs
+generate-coverage to set Python up before that step, in the same job, and only
+with versions inside `requires-python`. It compares versions with `packaging`,
+a development dependency.
+
 The publisher job declares `environment: codescene`. That environment admits
 deployments from `main` alone and is where the CodeScene token lives, so only
 the trunk publisher can read it. `tests/codescene_environment_rules.py` holds

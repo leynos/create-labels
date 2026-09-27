@@ -74,7 +74,7 @@ def test_every_call_declares_one_accepted_python() -> None:
     for lane, calls in _lane_calls().items():
         for call in calls:
             where = f"{lane}:{call.job}"
-            assert verdict(call) == "", f"{where} is {verdict(call)}: {call.sources}"
+            assert not verdict(call), f"{where} is {verdict(call)}: {call.sources}"
             assert rejected_versions(accepted, [call.effective]) == [], (
                 f"{where} measures on {call.effective}, outside {accepted}"
             )

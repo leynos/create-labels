@@ -127,6 +127,7 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "betamax" },
+    { name = "packaging" },
     { name = "pyright" },
     { name = "pytest" },
     { name = "pytest-bdd" },
@@ -147,6 +148,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "betamax", specifier = ">=0.9.0" },
+    { name = "packaging", specifier = ">=26.2" },
     { name = "pyright" },
     { name = "pytest" },
     { name = "pytest-bdd" },

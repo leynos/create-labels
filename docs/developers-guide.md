@@ -110,8 +110,9 @@ the rules is therefore a pin bump. The target needs `uv`, which fetches the
 Python 3.13 the library runs under. The repository's parameters are in
 `.github/cv005.toml`: its `repository` name and the `[selection]` inputs the
 baseline measures, which the publisher's generator must carry and every
-pull-request lane must match. `make test-workflow-contracts` enforces them. The library's own suite proves each rule
-refuses the shape it exists to refuse, so this repository keeps no copy of the
+pull-request lane must match. `make test-workflow-contracts` enforces them.
+The library's own suite proves each rule refuses the shape it exists to
+refuse, so this repository keeps no copy of the
 readers or the refusal cases. Its rules read every workflow a pull request can
 start, from its own events, reviews and comments, a merge queue, or a push not
 confined to `main` or tags, following local reusable-workflow calls,

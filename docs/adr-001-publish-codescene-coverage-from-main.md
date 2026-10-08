@@ -47,12 +47,12 @@ A separate workflow, `coverage-main.yml`, generates coverage on each push to
 `main`, writes the ratchet baseline, and uploads the report. Pull-request lanes
 generate coverage with the ratchet on and publish nothing.
 
-| Topic                          | Option A      | Option B            |
-| ------------------------------ | ------------- | ------------------- |
-| CodeScene API on the PR path   | Yes           | No                  |
-| Token in pull-request reach    | Yes           | No                  |
-| Baseline writers               | Every lane    | The publisher alone |
-| Coverage seen by CodeScene     | Every head    | Each `main` commit  |
+| Topic                        | Option A   | Option B            |
+| ---------------------------- | ---------- | ------------------- |
+| CodeScene API on the PR path | Yes        | No                  |
+| Token in pull-request reach  | Yes        | No                  |
+| Baseline writers             | Every lane | The publisher alone |
+| Coverage seen by CodeScene   | Every head | Each `main` commit  |
 
 _Table 1: Trade-offs between publishing from pull requests and from main._
 
@@ -79,8 +79,8 @@ the resulting workflow shape.
 ## Known risks and limitations
 
 - Merges made by the Dependabot automerge workflow use `GITHUB_TOKEN` and fire
-  no push, so they are measured only at the next push or a manual dispatch.
-  The fix belongs in the shared automerge workflow and is tracked in
+  no push, so they are measured only at the next push or a manual dispatch. The
+  fix belongs in the shared automerge workflow and is tracked in
   leynos/shared-actions#518.
 - A dispatch that replaces a pending push leaves the baseline one commit behind
   until the next push, also tracked in leynos/shared-actions#518.
@@ -92,8 +92,9 @@ the resulting workflow shape.
 ## Addendum, 2026-09-29: the contract moved to a shared library
 
 The contract that enforces this decision no longer lives in this repository.
-`make test-workflow-contracts` runs `cv005-contracts check`, the shared contract
-library in `leynos/shared-actions` (`packages/cv005-contracts`), from a full
-commit pinned in the Makefile, and `.github/cv005.toml` holds this repository's
-parameters. The clauses are unchanged, and the library's own suite proves each
-one. The paragraphs above name the repository-local copy this replaces.
+`make test-workflow-contracts` runs `cv005-contracts check`, the shared
+contract library in `leynos/shared-actions` (`packages/cv005-contracts`), from
+a full commit pinned in the Makefile, and `.github/cv005.toml` holds this
+repository's parameters. The clauses are unchanged, and the library's own suite
+proves each one. The paragraphs above name the repository-local copy this
+replaces.

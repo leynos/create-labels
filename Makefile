@@ -38,7 +38,7 @@ PYLINT_TARGETS ?= $(PYTHON_TARGETS)
 PYLINT = $(UV_GATE) tool --managed-python --python $(PYLINT_PYTHON) --from 'pylint==$(PYLINT_VERSION)' -- pylint
 
 
-.PHONY: prepare help all clean build build-release lint lint-python fmt check-fmt \
+.PHONY: prepare help all clean build build-release lint lint-python fmt check-fmt yamllint actionlint \
         markdownlint spelling nixie test typecheck $(TOOLS) $(VENV_TOOLS) test-workflow-contracts
 
 prepare: ## Install the locked development environment, offline first
@@ -113,7 +113,7 @@ check-fmt: build $(MDTABLEFIX) ## Verify formatting
 
 	$(MDTABLEFIX) --check $(MDTABLEFIX_SELECT) $(MDTABLEFIX_RULES)
 
-lint: lint-python ## Run linters
+lint: lint-python yamllint actionlint ## Run linters
 
 lint-python: build ## Run Python linters
 	$(UV_GATE) run -- ruff check $(PYTHON_TARGETS)
@@ -143,6 +143,17 @@ nixie: ## Validate Mermaid diagrams
 test: build $(VENV_TOOLS) ## Run tests
 	$(UV_GATE) run -- pytest -v -n $(PYTEST_XDIST_WORKERS)
 
+
+YAMLLINT ?= yamllint
+ACTIONLINT ?= actionlint
+
+# yamllint reads `.yamllint.yml`, which extends `.yamllint-estate.yml`, and
+# resolves that path against the working directory, so it runs from the root.
+yamllint: ## Lint every tracked YAML file strictly
+	git ls-files -z '*.yml' '*.yaml' | xargs -0 -r $(YAMLLINT) --strict --
+
+actionlint: ## Lint the GitHub Actions workflows, including their shell scripts
+	$(ACTIONLINT)
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*?##' $(MAKEFILE_LIST) | \

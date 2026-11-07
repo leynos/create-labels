@@ -82,15 +82,18 @@ class LabelApiHandler(BaseHTTPRequestHandler):
         """Silence request logs during tests."""
 
     def _read_json(self) -> dict[str, object]:
+        """Parse the JSON request body."""
         length = int(self.headers.get("content-length", "0"))
         raw_body = self.rfile.read(length)
         return typ.cast("dict[str, object]", json.loads(raw_body.decode("utf-8")))
 
     def _record_request(self, method: str) -> None:
+        """Append the request's method and path to the shared log, under its lock."""
         with self.__class__._requests_lock:
             self.requests.append((method, self.path))
 
     def _send_json(self, status: int, payload: dict[str, object]) -> None:
+        """Send ``payload`` as a JSON response with the given status."""
         body = json.dumps(payload).encode("utf-8")
         self.send_response(status)
         self.send_header("content-type", "application/json")
@@ -99,6 +102,7 @@ class LabelApiHandler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def _repository_payload(self) -> dict[str, object]:
+        """Load the repository fixture and replace its URL placeholders."""
         base_url = self._base_url()
         repo_url = f"{base_url}/repos/octocat/hello-world"
         raw_payload = _PAYLOAD_FIXTURE.read_text(encoding="utf-8")
@@ -111,6 +115,7 @@ class LabelApiHandler(BaseHTTPRequestHandler):
         color: str,
         description: str | None,
     ) -> dict[str, object]:
+        """Build the JSON payload for a label, with a URL on this server."""
         return {
             "id": abs(hash(name)) % 100_000,
             "name": name,
@@ -120,6 +125,7 @@ class LabelApiHandler(BaseHTTPRequestHandler):
         }
 
     def _base_url(self) -> str:
+        """Return the loopback URL this server listens on."""
         server = typ.cast("ThreadingHTTPServer", self.server)
         return f"http://127.0.0.1:{server.server_port}"
 
@@ -191,11 +197,16 @@ def _replace_payload_urls(
     base_url: str,
     repo_url: str,
 ) -> dict[str, object]:
+    """Replace the URL placeholders in the string values of a JSON payload mapping."""
     replaced = _replace_placeholders(value, base_url=base_url, repo_url=repo_url)
     return typ.cast("dict[str, object]", replaced)
 
 
 def _replace_placeholders(value: object, *, base_url: str, repo_url: str) -> object:
+    """Replace ``__BASE_URL__`` and ``__REPO_URL__`` in the string values of ``value``.
+
+    Dictionary keys are left as they are.
+    """
     if isinstance(value, str):
         return value.replace("__BASE_URL__", base_url).replace("__REPO_URL__", repo_url)
     if isinstance(value, list):

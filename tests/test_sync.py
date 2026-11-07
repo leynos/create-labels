@@ -84,6 +84,7 @@ def test_sync_labels_uses_raw_names_for_repository_lookup(
     lookups: list[str] = []
 
     def label(name: str) -> FakeLabel | None:
+        """Record the lookup and return ``existing`` only for the channel label."""
         lookups.append(name)
         if name == "scope: channel/cli":
             return existing
@@ -128,7 +129,7 @@ def test_sync_labels_failure_paths(
             color: str,
             description: str | None = None,
         ) -> None:
-            return None
+            """Create nothing and return no label."""
 
         monkeypatch.setattr(repository, "create_label", create_label)
     else:
@@ -136,6 +137,7 @@ def test_sync_labels_failure_paths(
             pytest.fail("update failure path requires an existing label")
 
         def update(name: str, color: str, description: str | None = None) -> bool:
+            """Reject the update by returning ``False``."""
             return False
 
         monkeypatch.setattr(existing, "update", update)

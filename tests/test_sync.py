@@ -129,7 +129,7 @@ def test_sync_labels_failure_paths(
             color: str,
             description: str | None = None,
         ) -> None:
-            """Accept the creation and do nothing."""
+            """Create nothing and return no label."""
 
         monkeypatch.setattr(repository, "create_label", create_label)
     else:
@@ -137,7 +137,7 @@ def test_sync_labels_failure_paths(
             pytest.fail("update failure path requires an existing label")
 
         def update(name: str, color: str, description: str | None = None) -> bool:
-            """Report that the update changed nothing."""
+            """Reject the update by returning ``False``."""
             return False
 
         monkeypatch.setattr(existing, "update", update)

@@ -197,13 +197,16 @@ def _replace_payload_urls(
     base_url: str,
     repo_url: str,
 ) -> dict[str, object]:
-    """Replace the URL placeholders throughout a JSON payload mapping."""
+    """Replace the URL placeholders in the string values of a JSON payload mapping."""
     replaced = _replace_placeholders(value, base_url=base_url, repo_url=repo_url)
     return typ.cast("dict[str, object]", replaced)
 
 
 def _replace_placeholders(value: object, *, base_url: str, repo_url: str) -> object:
-    """Replace ``__BASE_URL__`` and ``__REPO_URL__`` in every string of ``value``."""
+    """Replace ``__BASE_URL__`` and ``__REPO_URL__`` in the string values of ``value``.
+
+    Dictionary keys are left as they are.
+    """
     if isinstance(value, str):
         return value.replace("__BASE_URL__", base_url).replace("__REPO_URL__", repo_url)
     if isinstance(value, list):

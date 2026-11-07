@@ -11,6 +11,7 @@ class FakeLabel:
     """In-memory label object with the github3.py update shape."""
 
     def __init__(self, name: str, color: str, description: str | None) -> None:
+        """Store the label's fields, with no updates recorded yet."""
         self.name = name
         self.color = color
         self.description = description
@@ -29,6 +30,7 @@ class FakeRepository:
     """In-memory repository with the subset of github3.py used by sync."""
 
     def __init__(self, labels: list[FakeLabel] | None = None) -> None:
+        """Index the given labels by name, with no label created yet."""
         self.labels = {label.name: label for label in labels or []}
         self.created: list[LabelSpec] = []
 

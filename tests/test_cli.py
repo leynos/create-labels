@@ -32,6 +32,7 @@ class SyncCall:
             LabelSyncResult("risk: low", "created"),
         ),
     ) -> None:
+        """Store the results to return, and start with no recorded call."""
         self.results = results
         self.config: LabelConfig | None = None
         self.repository: RepositorySpec | None = None

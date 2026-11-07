@@ -102,7 +102,7 @@ class LabelApiHandler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def _repository_payload(self) -> dict[str, object]:
-        """Load the repository fixture with its URLs pointing at this server."""
+        """Load the repository fixture and replace its URL placeholders."""
         base_url = self._base_url()
         repo_url = f"{base_url}/repos/octocat/hello-world"
         raw_payload = _PAYLOAD_FIXTURE.read_text(encoding="utf-8")

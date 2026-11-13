@@ -17,7 +17,7 @@ reference material.
 
 ## Architectural decision records
 
-- [ADR 001: Publish CodeScene coverage from main](adr-001-publish-codescene-coverage-from-main.md):
+- [ADR 001: Publish CodeScene coverage from main](adrs/adr-0001-publish-codescene-coverage-from-main.md):
   why coverage is uploaded only from `main`, and why a dispatch cannot advance
   the ratchet baseline.
 

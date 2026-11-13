@@ -143,8 +143,9 @@ deployments from `main` alone and is where the CodeScene token lives, so only
 the trunk publisher can read it. The shared library holds the placement: every
 uploading job declares the environment, as a string or as `{name: codescene}`;
 no other job declares it; and no workflow a pull request can start declares it
-in any job. [ADR 001](adr-001-publish-codescene-coverage-from-main.md) records
-why publication moved to `main` and why a dispatch cannot advance the baseline.
+in any job. [ADR 001](adrs/adr-0001-publish-codescene-coverage-from-main.md)
+records why publication moved to `main` and why a dispatch cannot advance the
+baseline.
 
 ## Mutation-testing workflow contract tests
 

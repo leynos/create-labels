@@ -73,8 +73,8 @@ fresh report while the ratchet catches up at the next push.
 
 The contract tests under `tests/` hold this shape, and every clause is proved
 by a mutation that the clause refuses. The
-[developers' guide](developers-guide.md#coverage-workflow-contract) describes
-the resulting workflow shape.
+[developers' guide](../developers-guide.md#coverage-workflow-contract)
+describes the resulting workflow shape.
 
 ## Known risks and limitations
 

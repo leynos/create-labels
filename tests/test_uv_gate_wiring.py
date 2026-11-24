@@ -1,4 +1,4 @@
-"""Contract: every uv call in the Makefile goes through the vendored helper.
+"""Contract: every uv call in the Makefile but the builder's goes through the helper.
 
 The helper (``scripts/uv_gate.py``) is copied byte for byte from
 leynos/shared-actions and audited by concordat's ``uv-gate-baseline`` rule.
@@ -25,11 +25,9 @@ EXPECTED_DEFAULT_GOAL = "all"
 # the project only through a recursive $(MAKE) is covered by that sub-target).
 GATES: tuple[tuple[str, tuple[str, ...], bool, bool], ...] = (
     ("pytest", ("which",), True, True),
-    ("spelling", ("python", "typos"), True, True),
     ("lint", ("pylint", "ruff"), True, True),
     ("build-release", ("python",), True, True),
     ("lint-python", ("pylint", "ruff"), True, True),
-    ("markdownlint", ("python", "typos"), True, False),
     ("fmt", ("ruff",), True, True),
     ("typecheck", ("ty",), True, True),
     ("test-workflow-contracts", ("cv005-contracts",), False, False),
@@ -39,10 +37,8 @@ GATES: tuple[tuple[str, tuple[str, ...], bool, bool], ...] = (
             "cv005-contracts",
             "pylint",
             "pytest",
-            "python",
             "ruff",
             "ty",
-            "typos",
             "which",
         ),
         True,
@@ -58,6 +54,7 @@ PREPARE_TARGETS: tuple[str, ...] = ("prepare",)
 ALLOWED_UV_LINES: tuple[str, ...] = (
     '@command -v $(UV) >/dev/null 2>&1 || { printf "Error: uv is required, but \'%s\' was not found or is not executable\\n" "$(UV)" >&2; exit 1; }',  # noqa: E501
     "UV ?= $(shell command -v uv 2>/dev/null || printf '%s/.local/bin/uv' \"$$HOME\")",
+    'TYPOS_CONFIG_BUILDER = uv tool run --python 3.14 --from "git+https://github.com/leynos/typos-config-builder.git@$(TYPOS_CONFIG_BUILDER_VERSION)" typos-config-builder',  # noqa: E501
     "export PATH := $(if $(findstring /,$(UV)),$(patsubst %/,%,$(dir $(UV))):)$(PATH)",
 )
 MAKE = shutil.which("make")
